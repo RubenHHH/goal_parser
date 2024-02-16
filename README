@@ -1,0 +1,8 @@
+GO here:
+https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF/tree/main
+
+And download:
+llama-2-7b-chat.Q2_K.gguf
+
+Add this file to:
+./chatbot_api
