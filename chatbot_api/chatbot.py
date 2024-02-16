@@ -56,15 +56,15 @@ examples = [
 # )
 
 prefix= """
-    Given the user input and based on the context, identify the intents from the following list: 
-    ["parking recommendation", "ticket availability", "weather checking", "event booking"]. What is meant by intent is what the user is reauesting. 
+    Given the user input after </SYS>, identify the user's intents / user goals. If any of the intents in the following list are implied by the user, add this intent to your response list: 
+    ["parking recommendation", "ticket availability", "weather checking", "event booking"]. 
     The user has been instructed to make a request based on the following description: 'This app is used during the street science days in L'Aquila. Please make requests relating to the following topics: [parking advice, ticket availability, weather check, event booking].'
-    The number of intents can range from 0 to 4 and an intent should not be repeated.
+    The number of intents identified by you can range from 0 to 4 and an intent should not be repeated.
 """
 
-suffix="""
-    Respond based on the following intent: {query},
-"""
+# suffix="""
+#     Respond based on the following user message: {query},
+# """
 
 # few_shot_template = FewShotPromptTemplate(
 #     examples=examples,
@@ -106,8 +106,8 @@ def invokeChatbot(message: str):
     max_tokens = 100
     model_path = "./llama-2-7b-chat.Q2_K.gguf"
 
-    suffix= f"""
-        Respond based on the following intent: {message},
+    suffix=f"""
+        Respond based on the following user message: {message},
     """
     system_message = construct_prompt(message, construct_system_message(prefix, examples, suffix))
     prompt = system_message
