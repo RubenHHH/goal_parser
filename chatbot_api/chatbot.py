@@ -55,10 +55,30 @@ examples = [
 #     template=example_template
 # )
 
+# prefix= """
+#     Given the user input after </SYS>, identify the user's intents / user goals. If any of the intents in the following list are implied by the user, add this intent to your response list: 
+#     ["parking recommendation", "ticket availability", "weather checking", "event booking"]. 
+#     The user has been instructed to make a request based on the following description: 'This app is used during the street science days in L'Aquila. Please make requests relating to the following topics: [parking advice, ticket availability, weather check, event booking].'
+#     The number of intents identified by you can range from 0 to 4 and an intent should not be repeated.
+# """
+
 prefix= """
-    Given the user input after </SYS>, identify the user's intents / user goals. If any of the intents in the following list are implied by the user, add this intent to your response list: 
-    ["parking recommendation", "ticket availability", "weather checking", "event booking"]. 
-    The user has been instructed to make a request based on the following description: 'This app is used during the street science days in L'Aquila. Please make requests relating to the following topics: [parking advice, ticket availability, weather check, event booking].'
+    Given the user input after </SYS>, identify the user's intents / user goals. If any of the intents in the following list are implied by the user, add this intent to your response list
+    
+    Intents:
+    - 'parking recommandation': Indicates the user wants to know where to park their car, they will ask for a location.
+    - 'ticket availability': Indicates the user wants to know if there are free places to the event they want to attend.
+    - 'weather checking': Indicates the user wants to know about the current weather or temperature.
+    - 'event booking': Indicates the user wants to participate to a gathering by purchasing a billet. The gathering can be a concert, sport event, festival, play or exhibition.
+    
+    The user has been instructed to make a request based on the following context: 'This app is used during the street science days in L'Aquila. Please make requests relating to the following topics: [parking advice, ticket availability, weather check, event booking].'
+    
+    Instructions:
+    1. Analyze the user input to determine which intents are present.
+    2. Consider the context to understand the underlying meaning of the user input.
+    3. Output the identified intents.
+
+
     The number of intents identified by you can range from 0 to 4 and an intent should not be repeated.
 """
 
@@ -104,10 +124,10 @@ def construct_prompt(user_message: str, system_message: str = " ") -> str:
 
 def invokeChatbot(message: str):
     max_tokens = 100
-    model_path = "./llama-2-7b-chat.Q2_K.gguf"
+    model_path = "./llama-2-13b-chat.Q2_K.gguf"
 
     suffix=f"""
-        Respond based on the following user message: {message},
+        Respond based on the following user input: {message},
     """
     system_message = construct_prompt(message, construct_system_message(prefix, examples, suffix))
     prompt = system_message
