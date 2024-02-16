@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from llama_cpp import Llama
-from chatbot import invoke
+from chatbot import invokeChatbot
 
 # from chatbot import invoke_few_shot_template
 
@@ -55,23 +55,14 @@ def predict():
         return jsonify({'error': str(e)}), 500
     
 @app.route('/api/chatbot', methods=['POST'])
-def predict():
+def chatbot():
     data = request.json
 
-
-    prompt = f"""<s>[INST] <<SYS>>
-    {system_message}
-    <</SYS>>
-    {data['message']} [/INST]"""
-
-    # Model parameters
-    max_tokens = 100
-
-    # Run the model
     try:
-        output = invoke(data['message'])
-        # extracted_text = output["choices"][0]["text"]
-        return jsonify({'message': str(output)})
+        output = invokeChatbot(data['message'])
+        print(str(output))
+        extracted_text = output["choices"][0]["text"]
+        return jsonify({'message': str(extracted_text)})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -51,7 +51,7 @@ function Chatbot() {
         setIsLoading(true)
         console.log("test");
         const dataToSend = { 'message': currInput };
-        const response = await fetch('http://127.0.0.1:5001/api/predict', {
+        const response = await fetch('http://127.0.0.1:5001/api/chatbot', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

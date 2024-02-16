@@ -2,7 +2,7 @@ from langchain.prompts import FewShotPromptTemplate, PromptTemplate
 from langchain.chains import LLMChain
 from llama_cpp import Llama
 
-model_path = "./llama-2-7b-chat.Q2_K.gguf"
+# model_path = "./llama-2-7b-chat.Q2_K.gguf"
 
 
 examples = [
@@ -45,52 +45,77 @@ examples = [
 ]
 
 
-example_template = """
-    User:{query},
-    AI:{answer}
+# example_template = """
+#     User:{query},
+#     AI:{answer}
+# """
+
+# example_prompt = PromptTemplate(
+#     input_variables=["query", "answer"],
+#     template=example_template
+# )
+
+prefix= """
+    Given the user input and based on the context, identify the intents from the following list: 
+    ["parking recommendation", "ticket availability", "weather checking", "event booking"]. What is meant by intent is what the user is reauesting. 
+    The user has been instructed to make a request based on the following description: 'This app is used during the street science days in L'Aquila. Please make requests relating to the following topics: [parking advice, ticket availability, weather check, event booking].'
+    The number of intents can range from 0 to 4 and an intent should not be repeated.
 """
-
-example_prompt = PromptTemplate(
-    input_variables=["query", "answer"],
-    template=example_template
-)
-
-prefix= """ The following are excerpts from conversations with an AI
-    assistant. The assistant is known for its accurate responses to users' questions. Here are some
-    examples:"""
 
 suffix="""
-    User:{query},
-    AI:
+    Respond based on the following intent: {query},
 """
 
-few_shot_template = FewShotPromptTemplate(
-    examples=examples,
-    example_prompt=example_prompt,
-    prefix=prefix,
-    suffix=suffix,
-    input_variables=["query"],
-    example_separator="\n\n"
-)
+# few_shot_template = FewShotPromptTemplate(
+#     examples=examples,
+#     example_prompt=example_prompt,
+#     prefix=prefix,
+#     suffix=suffix,
+#     input_variables=["query"],
+#     example_separator="\n\n"
+# )
 
-llm = Llama(model_path=model_path)
-chain = LLMChain(llm=llm, prompt=few_shot_template, verbose=0)
+# llm = Llama(model_path=model_path)
+# chain = LLMChain(llm=llm, prompt=few_shot_template, verbose=0)
 
-def construct_message(system_message: str, user_message: str) -> str:
+
+def construct_system_message(
+    prefix: str, 
+    examples: dict[str, str],
+    suffix: str,
+) -> str:
+    system_message = prefix + "\n"
+    # system_message += "Here are some examples:\n\n"
+    # for example in examples:
+    #     system_message += f"User: {example['query']}\n"
+    #     system_message += f"AI: {example['answer']}\n\n"
+    system_message += suffix
+    return system_message
+    
+
+def construct_prompt(user_message: str, system_message: str = " ") -> str:
+    assert(system_message != None)
+    assert(system_message != "")
+
     return f"""<s>[INST] <<SYS>>
-    {system_message}
-    <</SYS>>
-    {user_message} [/INST]"""
+        {system_message}
+        <</SYS>> 
+        {user_message} [/INST]"""
 
-def invoke(message: str):
+def invokeChatbot(message: str):
+    max_tokens = 100
+    model_path = "./llama-2-7b-chat.Q2_K.gguf"
 
+    suffix= f"""
+        Respond based on the following intent: {message},
+    """
+    system_message = construct_prompt(message, construct_system_message(prefix, examples, suffix))
+    prompt = system_message
 
+    n_ctx = system_message.count(' ')*2 + max_tokens
+    print(n_ctx)
+    model = Llama(model_path=model_path, n_ctx=n_ctx)
 
-    return chain.invoke(input=message)['text']
-
-
-prompt = f"""<s>[INST] <<SYS>>
-    {system_message}
-    <</SYS>>
-    {data['message']} [/INST]"""
+    output = model(prompt, max_tokens=max_tokens, echo=True)
+    return output
     
