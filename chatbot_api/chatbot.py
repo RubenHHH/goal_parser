@@ -62,8 +62,44 @@ examples = [
 #     The number of intents identified by you can range from 0 to 4 and an intent should not be repeated.
 # """
 
-prefix= """
-    Given the user input after </SYS>, identify the user's intents / user goals. If any of the intents in the following list are implied by the user, add this intent to your response list
+prefix1= """
+    Given the user input, determine if the request aligns with one of the following specified intents:
+
+    Intents:
+    
+    - 'parking recommendation': Indicates the user wants to know where to park their vehicle, they will ask for a location.
+    - 'ticket availability': Indicates the user wants to know if there are free places to the event they want to attend.
+    - 'weather checking': Indicates the user wants to know about the current weather or temperature.
+    - 'event booking': Indicates the user wants to participate to a gathering by purchasing a billet. The gathering can be a concert, sport event, festival, play or exhibition.
+    
+    Context: This service is tailored for attendees of the Street Science days in L'Aquila. Users are encouraged to make requests related to parking, ticketing for events, weather information, or event bookings only.
+
+    Your task is to analyze the user's input and identify whether it falls within the specified intents. If the input does not align with these intents, or includes requests outside the specified categories, instruct the user to refine their query according to the available services.
+
+    Output Guidelines:
+    Your response must strictly be one of the following, based on the user's input. Do not include any additional explanations, greetings, or any text beyond what is specified here.
+
+    - If all parts of the user's request fall within the specified intents, respond with 'OK'.
+    - If any part of the request is outside the specified intents, respond with: "What can I help you with? Your request should be one or multiple intents falling under the four listed above."
+
+    Ensure that your output matches one of these two options, word for word
+    
+    Example User Inputs and Expected Responses:
+    -> User: "How old am I?". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "Can I pet my dog?". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "I want to visit Rome". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "I want to buy a car". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "Where is my sandwich?". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "I feel lonely". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "Where is the concert happening tonight"?. Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
+    -> User: "Will it be cold tonight?". Expected output: OK.
+    -> User: "Can I still buy places for tonight's play?". Expected output: OK.
+    -> User: "Are there any spots for my motorbike near the theatre?". Expected output: OK.
+
+"""
+
+prefix2= """
+    The user input you will get after </SYS> will be one or multiple of the intents stated in the below list.
     
     Intents:
     - 'parking recommandation': Indicates the user wants to know where to park their car, they will ask for a location.
@@ -76,11 +112,20 @@ prefix= """
     Instructions:
     1. Analyze the user input to determine which intents are present.
     2. Consider the context to understand the underlying meaning of the user input.
-    3. Output the identified intents.
+    3. Output the identified intents in a list and no other explanation.
 
 
     The number of intents identified by you can range from 0 to 4 and an intent should not be repeated.
 """
+
+prefix3= """
+
+"""
+
+    # Instructions:
+    # 1. Analyze the user input to detemine if it belongs to one of the intents of the list provided above. 
+    # 2. If all the intents identified don't fall under the categories of intents of the above list, reply to the user what you can help them with and ask the user to reiterate their request, asking exclusively for the intents above.
+    # 3. If you identify that everything asked is falling under the intents category, output 'status = OK'
 
 # suffix="""
 #     Respond based on the following user message: {query},
@@ -122,20 +167,26 @@ def construct_prompt(user_message: str, system_message: str = " ") -> str:
         <</SYS>> 
         {user_message} [/INST]"""
 
-def invokeChatbot(message: str):
-    max_tokens = 100
+def invokeChatbot(message: str): #add status when needed
+    max_tokens = 300
     model_path = "./llama-2-13b-chat.Q2_K.gguf"
+
+
 
     suffix=f"""
         Respond based on the following user input: {message},
     """
-    system_message = construct_prompt(message, construct_system_message(prefix, examples, suffix))
+    system_message = construct_prompt(message, construct_system_message(prefix1, examples, suffix))
     prompt = system_message
 
-    n_ctx = system_message.count(' ')*2 + max_tokens
-    print(n_ctx)
+    n_ctx = system_message.count(' ')*3 + max_tokens
+    print('n_ctx = ', n_ctx)
     model = Llama(model_path=model_path, n_ctx=n_ctx)
 
-    output = model(prompt, max_tokens=max_tokens, echo=True)
-    return output
+    output = model(prompt, max_tokens=max_tokens, echo=False)
+
+    # if (output == 'OK'):
+    #     status = "NEXT"
+
+    return output #add status when needed 
     

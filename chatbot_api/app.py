@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from llama_cpp import Llama
@@ -58,11 +59,23 @@ def predict():
 def chatbot():
     data = request.json
 
+    message = data['message']
+    logging.info("testing message")
+    #status = data['status']
+    logging.info("testing status")
+
     try:
-        output = invokeChatbot(data['message'])
-        print(str(output))
+        #status, 
+        output = invokeChatbot(message) #add status when needed 
+        # print(str(output))
         extracted_text = output["choices"][0]["text"]
-        return jsonify({'message': str(extracted_text)})
+        return jsonify(
+            {
+                #'status': status,
+                'message': str(extracted_text), #status + "  " + 
+
+            }
+        )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

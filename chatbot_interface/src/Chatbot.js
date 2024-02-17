@@ -24,8 +24,9 @@ function Chatbot() {
 
   const [messages, setMessages] = useState([preparedMessage]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  //const [status, setStatus] = useState("START");
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -50,7 +51,10 @@ function Chatbot() {
       try {
         setIsLoading(true)
         console.log("test");
-        const dataToSend = { 'message': currInput };
+        const dataToSend = { 
+          'message': currInput,
+          //'status': status
+        };
         const response = await fetch('http://127.0.0.1:5001/api/chatbot', {
           method: 'POST',
           headers: {
@@ -67,8 +71,8 @@ function Chatbot() {
   
         const data = await response.json();
 
-        console.log("oooooooo");
-  
+        
+        // setStatus(data.status)
         setMessages(prevMessages => [...prevMessages, { text: data.message, sender: 'bot' }]);
       } catch (error) {
         setError(error)
