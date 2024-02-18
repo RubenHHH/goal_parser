@@ -72,46 +72,46 @@ Your output is directed towards understanding and addressing user intent as spec
 """
 
 examples_logicalOperators = [
-    {
-        'functions': "weather_checking, parking_recommendations, ticket_availability",
-        'user_requests': "I want to know the weather today and parking_recommendations or check ticket_availability for tonight\'s concert.",
-        'output': "[ 'weather_checking' and ['parking_recommendation' or 'ticket_availability']]"
-    },
-    {
-        'functions': "weather_checking, ticket_availability, parking_recommendation",
-        'user_requests': "I need the tickets to the exhibition if the weather is warm and nice and also provide parking_recommendations",
-        'output': "seq ['weather_checking' ; 'ticket_availability']  and 'parking_recommendation'"
-    },
-    {
-        'functions': "weather_checking, parking_recommendations, ticket_availability, event_booking",
-        'user_requests': "Provide one the following information, details regarding the weather today, place to park my card, tickets to the show tonight. Also provide event_booking details for the show.",
-        'output': "one_of'[weather_checking' ; 'parking_recommendation' ; 'ticket_availability'] and 'event_booking'"
-    },
-    {
-        'functions': "ticket_availability, event_booking, weather-checking",
-        'user_requests': "I want to know the ticket_availability or event_booking details and the information regarding the weather today",
-        'output': "[['ticket_availability' or 'event_booking'] and 'weather_checking']"
-    },
+    # {
+    #     'functions': "weather_checking, parking_recommendations, ticket_availability",
+    #     'user_requests': "I want to know the weather today and parking_recommendations or check ticket_availability for tonight\'s concert.",
+    #     'output': "[ 'weather_checking' and ['parking_recommendation' or 'ticket_availability']]"
+    # },
+    # {
+    #     'functions': "weather_checking, ticket_availability, parking_recommendation",
+    #     'user_requests': "I need the tickets to the exhibition if the weather is warm and nice and also provide parking_recommendations",
+    #     'output': "seq ['weather_checking' ; 'ticket_availability']  and 'parking_recommendation'"
+    # },
+    # {
+    #     'functions': "weather_checking, parking_recommendations, ticket_availability, event_booking",
+    #     'user_requests': "Provide one the following information, details regarding the weather today, place to park my card, tickets to the show tonight. Also provide event_booking details for the show.",
+    #     'output': "one_of'[weather_checking' ; 'parking_recommendation' ; 'ticket_availability'] and 'event_booking'"
+    # },
+    # {
+    #     'functions': "ticket_availability, event_booking, weather-checking",
+    #     'user_requests': "I want to know the ticket_availability or event_booking details and the information regarding the weather today",
+    #     'output': "[['ticket_availability' or 'event_booking'] and 'weather_checking']"
+    # },
     # {
     #     'functions': "ticket_availability, parking_recommendation",
     #     'user_requests': "I need to know if tickets are available to the concert and also please recommend good parking spots",
     #     'output': "['ticket_availability' and 'parking_recommendation']"
     # },
-    {
-        'functions': "weather_checking, parking_recommendation",
-        'user_requests': "Please check the weather and also recommend good parking spots",
-        'output': "['weather_checking' and 'parking_recommendation']"
-    },
-    {
-        'functions': "event_booking, ticket_availability",
-        'user_requests': "I want to know the details regarding the event tonight or some information regarding ticket_availability",
-        'output': "['event_booking' or 'ticket_availability']"
-    },
-    {
-        'functions': "ticket_availability, weather_checking",
-        'user_requests': "First, I need to know the ticket_availability and then the weather outside ",
-        'output': "seq ['ticket_availability' ; 'weather_checking']"
-    },
+    # {
+    #     'functions': "weather_checking, parking_recommendation",
+    #     'user_requests': "Please check the weather and also recommend good parking spots",
+    #     'output': "['weather_checking' and 'parking_recommendation']"
+    # },
+    # {
+    #     'functions': "event_booking, ticket_availability",
+    #     'user_requests': "I want to know the details regarding the event tonight or some information regarding ticket_availability",
+    #     'output': "['event_booking' or 'ticket_availability']"
+    # },
+    # {
+    #     'functions': "ticket_availability, weather_checking",
+    #     'user_requests': "First, I need to know the ticket_availability and then the weather outside ",
+    #     'output': "seq ['ticket_availability' ; 'weather_checking']"
+    # },
     # {
     #     'functions': "event_booking, weather_checking",
     #     'user_requests': "Provide information regarding the event tonight if the weather is good outside",
@@ -305,24 +305,24 @@ def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str],
 
 
 def extract_string_within_square_brackets(input_string: str):
-    start_index = input_string.find('+++[')
-    end_index = input_string.rfind(']===')
+    start_index = input_string.find('++[')
+    end_index = input_string.rfind(']==')
     
     if start_index == -1 or end_index == -1:
         return None  # No square brackets found
     
-    return input_string[start_index+3:end_index -1]
+    return input_string[start_index+2:end_index -1]
 
 
 
-def lowest_positive_integer(numbers):
-    min_positive = None
+# def lowest_positive_integer(numbers):
+#     min_positive = None
     
-    for num in numbers:
-        if num > 0 and (min_positive is None or num < min_positive):
-            min_positive = num
+#     for num in numbers:
+#         if num > 0 and (min_positive is None or num < min_positive):
+#             min_positive = num
     
-    if min_positive is None:
-        return -1
+#     if min_positive is None:
+#         return -1
     
-    return min_positive
+#     return min_positive
