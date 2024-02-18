@@ -2,7 +2,7 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from llama_cpp import Llama
-from chatbot import invokeChatbot, askFunctionsCorrect, identifyFucntions
+from chatbot import invokeChatbot, askFunctionsCorrect, identifyLogicalOperators
 
 # from chatbot import invoke_few_shot_template
 
@@ -94,8 +94,9 @@ def chatbot():
 
 
     try:
-        notepad['user_requests'] = "- I want to go to an concert and I need to know if I there are any places left for me. Where do I leave my motocycle?\n"
-        output, status, notepad = identifyFucntions(message, status, notepad, log) #add status when needed 
+        notepad['functions'] = "ticket availability, event booking, weather checking, parking recommendations"
+        notepad['user_requests'] = "- I want to first check the ticket availability and if tickets are available then book the event. Or provide details regarding the weather today and parking recommendations.\n"
+        output, status, notepad = identifyLogicalOperators(message, status, notepad, log) #add status when needed 
         # print(str(output))
         log("5")
         return jsonify(

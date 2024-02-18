@@ -82,7 +82,7 @@ prefix_functionIdentification= """
 """
 
 prefix_identifyLogicalOperations= """
-    Given the user input after </SYS>, identify the relationship. If any of the relationships in the following list are implied by the user, add this relationship to your response list.
+    Given the message(s) after </SYS>, identify the relationships between the intents listed after </SYS>. If any of the relationships in the following list are implied by the user, add this relationship to your response list.
     
     Relationship:
     [Choose one of the following options: AND, OR, ONE_OF, SEQ]
@@ -120,11 +120,18 @@ prefix_askFunctionCorrect = """
     Only ouput the question.
 """
 
-
+examples_logicalOperators = [
+    {
+        'functions': "",
+        'user_requests': "", 
+        'output': ""
+    },
+]
 
 # ------------- vars ------------------
 max_tokens = 300
 model_path = "./llama-2-13b-chat.Q2_K.gguf"
+
 def getModelBasedOnInput(prompt: str, logger):
     n_ctx = prompt.count(' ')*2 + max_tokens
     logger(n_ctx)
@@ -207,5 +214,43 @@ def askFunctionsCorrect(message: str, status: str, notepad: dict[str, str], logg
     logger("t2")
 
     extracted_text : str = output["choices"][0]["text"]
+    
+    return (extracted_text, status, notepad)
+
+
+def generateMessageLogicalOperators(functions: str, user_requests: str) -> str:
+    message =  f"The identified intents are: {functions}\n"
+    return f"{message}The user's message(s) that has to be parsed for determining relationships between intents are: \n {user_requests}\n\n"
+
+def generatePrefixLogicalOperators(examples: list[dict[str, str]]) -> str:
+    prefix = prefix_identifyLogicalOperations
+    prefix += '\nHere are some examples of input you can receive and what you should ouput based on that input.\n'
+    for i in range(len(examples)):
+        prefix += f"example {i}:\n - "
+        prefix += generateMessageLogicalOperators(examples[i]['functions'], examples[i]['user_requests'])
+        i += 1
+    return prefix
+
+
+def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str], logger):
+    logger(f"identifyLogicalOperators with {(message, status, notepad)}")
+
+    message = "The identified intents are: " + notepad['functions'] + "\n\n"
+    message += f"The user's message(s) that has to be parsed for determining relationships between intents are: \n {notepad['user_requests']}"
+
+    prompt = construct_prompt(
+        generateMessageLogicalOperators(
+            notepad['functions'], 
+            notepad['user_requests']
+        ), 
+        generatePrefixLogicalOperators(examples_logicalOperators),
+    )
+
+    model = getModelBasedOnInput(prompt, logger)
+    output = model(prompt, max_tokens=max_tokens, echo=False)
+
+    extracted_text : str = output["choices"][0]["text"]
+
+    status = 'STRUCTURE'
     
     return (extracted_text, status, notepad)

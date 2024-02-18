@@ -6,3 +6,35 @@ llama-2-7b-chat.Q2_K.gguf
 
 Add this file to:
 ./chatbot_api
+
+
+
+
+
+
+
+
+
+
+AND
+OR
+ONE_OF
+SEQ
+
+
+parking_recommendation AND ticket_availability
+
+(parking_recommendation AND ticket_availability) OR (parking_recommendation AND weather_checking)
+
+OR{
+    [
+        AND{
+        parking_recommendation,
+        ticket_availability
+        },
+        AND{
+            parking_recommendation,
+            weather_checking
+        }
+    ]
+}
