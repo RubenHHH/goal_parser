@@ -105,7 +105,7 @@ def chatbot():
             {
                 'status': status,
                 'notepad': notepad,
-                'message': output, #status + "  " + 
+                'message': output,
             }
         )
     except Exception as e:
