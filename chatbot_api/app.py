@@ -2,7 +2,6 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from chatbot.identifyLogicalOperators import identifyLogicalOperators
-from chatbot.demo import notRelevant, askFunctions, askLogicalOperators, returnGrammar
 
 # from chatbot import invoke_few_shot_template
 
@@ -115,7 +114,11 @@ def demo():
         return jsonify({"error": "Request must be JSON"}), 400
 
     data = request.json
-    data["status"] = int(data["status"])
+    log(data)
+    if data["status"] == None:
+        data["status"] = 0
+    else:
+        data["status"] = int(data["status"])
 
     if "message" not in data or not isinstance(data["message"], str):
         return jsonify({"error": "JSON must contain the 'message' key with a string value"}), 400
@@ -124,10 +127,10 @@ def demo():
         response_message = "Your request is not valid.  I am afraid I cannot help you. Please ask me requests falling under the categories of the weather, ticket availability, event booking and parking recommendation"
         data["status"] += 1
     elif data["status"] == 1:
-        response_message = "If I understand correctly, you want first to know about the weather and then about the ticket availability?"
+        response_message = "If I understand correctly, you want information about the weather and about parking recommendation. Is this correct?"
         data["status"] += 1
     elif data["status"] == 2:
-        response_message = "I am sorry, I understood it wrong. You want to know first about the ticket availability and then the weather?"
+        response_message = "I am sorry, I understood it wrong. you want information about the weather and about ticket availability. Is this correct?"
         data["status"] += 1 
     elif data["status"] == 3:
         response_message = "If I understand correctly, you want first to know about the weather and then about the ticket availability?"
