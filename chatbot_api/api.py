@@ -2,6 +2,8 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from chatbot.identifyLogicalOperators import identifyLogicalOperators
+from chatbot.askFunctionsCorrect import askFunctionsCorrect
+from chatbot.noteStatus import noteStatus
 
 # from chatbot import invoke_few_shot_template
 
@@ -94,10 +96,11 @@ def chatbot():
 
     try:
         notepad['functions'] = "parking_recommendation, event_booking"
-        notepad['user_requests'] = "- First I want to know where to park then I want to book a concert"
-        output, status, notepad = identifyLogicalOperators(message, status, notepad, log) #add status when needed 
+        notepad['user_requests'] = "No, I want just the parking availability"
+        status = 'FUNCTIONS'
+        output, status, notepad = noteStatus(message, status, notepad, log)
         # print(str(output))
-        log("5")
+        log(f"5: {(output, status, notepad)}")
         return jsonify(
             {
                 'status': status,

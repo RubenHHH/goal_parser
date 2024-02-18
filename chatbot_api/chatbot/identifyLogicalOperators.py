@@ -61,6 +61,7 @@ Examples of correct format include:
 - `+++seq [[`intent1` or `intent2`] ; `intent3`]===`
 - `+++one_of [`intent1` ; [`intent2` or `intent3`]]===`
 
+Note that you have a preference for choosing the 'and' operator, so you have to be absolutely sure that the relationship between intents is 'and'. Choosing 'or', 'seq', 'one_of' is more likely.
  
 Drawing Inspiration from Examples:
  
@@ -270,16 +271,6 @@ def _generateMessageLogicalOperators(functions: str, user_requests: str) -> str:
     message =  f'The identified intents are: \n - {functions}\n\n'
     return f"{message}The user's message(s) that have to be analyzed for determining relationships between intents are: <<<\n{user_requests}>>>\n"
 
-def _addExamplesToPrefix(examples: list[dict[str, str]]) -> str:
-    prefix = prefix_identifyLogicalOperations
-    # prefix += "\nHere are some examples of user's messages you can hypothetically receive between <<< and >>> after </SYS> and what you should ouput based on that message.\n"
-    # for i in range(len(examples)):
-    #     prefix += f'example {i}:\n - '
-    #     prefix += _generateMessageLogicalOperators(examples[i]['functions'], examples[i]['user_requests'])
-    #     prefix += examples[i]['output'] + '\n'
-    #     i += 1
-    return prefix
-
 
 def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str], logger):
     logger(f'identifyLogicalOperators with {(message, status, notepad)}')
@@ -289,7 +280,7 @@ def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str],
             notepad['functions'], 
             notepad['user_requests']
         ), 
-        _addExamplesToPrefix(examples_logicalOperators),
+        prefix_identifyLogicalOperations
     )
 
     logger(prompt)
@@ -305,13 +296,13 @@ def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str],
 
 
 def extract_string_within_square_brackets(input_string: str):
-    start_index = input_string.find('++[')
     end_index = input_string.rfind(']==')
+    start_index = input_string.rfind('++[')
     
     if start_index == -1 or end_index == -1:
         return None  # No square brackets found
     
-    return input_string[start_index+2:end_index -1]
+    return input_string[start_index+2:end_index +1]
 
 
 

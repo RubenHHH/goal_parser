@@ -10,7 +10,7 @@ import './App.css'
 //   .catch(error => console.error('Error fetching data: ', error));
 
 function Chatbot() {
-  const preparedMessage = { text: "Please state your goal. I can find the following:\n - the weather\n - booking events\n - something else\n - and another thing", sender: 'bot'};
+  const preparedMessage = { text: 'Hello there,\nI am your personal assistant for the street science days in L\'Aquila.\n\nYou can tell me what you want to do and I will help you.\n\nI can help you with the following:\n - Parking recommendations\n - Getting weather information\n - Checking ticket availability for events\n - Booking tickets for events', sender: 'bot'};
   const convertStringToReact = (inputString) => {
     const lines = inputString.split('\n');
   
