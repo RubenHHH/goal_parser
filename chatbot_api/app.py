@@ -2,6 +2,7 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from chatbot.identifyLogicalOperators import identifyLogicalOperators
+from chatbot.demo import notRelevant, askFunctions, askLogicalOperators, returnGrammar
 
 # from chatbot import invoke_few_shot_template
 
@@ -108,6 +109,38 @@ def chatbot():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route("/api/demo", methods=["POST"])
+def demo():
+    if not request.is_json:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+    data = request.json
+    data["status"] = int(data["status"])
+
+    if "message" not in data or not isinstance(data["message"], str):
+        return jsonify({"error": "JSON must contain the 'message' key with a string value"}), 400
+
+    if data["status"] == 0:
+        response_message = "Your request is not valid.  I am afraid I cannot help you. Please ask me requests falling under the categories of the weather, ticket availability, event booking and parking recommendation"
+        data["status"] += 1
+    elif data["status"] == 1:
+        response_message = "If I understand correctly, you want first to know about the weather and then about the ticket availability?"
+        data["status"] += 1
+    elif data["status"] == 2:
+        response_message = "I am sorry, I understood it wrong. You want to know first about the ticket availability and then the weather?"
+        data["status"] += 1 
+    elif data["status"] == 3:
+        response_message = "If I understand correctly, you want first to know about the weather and then about the ticket availability?"
+        data["status"] += 1
+    elif data["status"] == 4:
+        response_message = "I am sorry, I understood it wrong. You want to know first about the ticket availability and then the weather?"
+        data["status"] += 1
+    else:
+        response_message = "seq ['ticket_availability'; 'weather_checking']"
+    
+
+    return jsonify({"message": response_message,
+                    "status" : str(data["status"])})
 
 # @app.route("/api/chatbot", methods=["POST"])
 # def get_response():

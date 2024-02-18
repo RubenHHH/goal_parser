@@ -28,7 +28,6 @@ function Chatbot() {
   const [error, setError] = useState(null);
   
   let status = null
-  let notepad = null
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -59,11 +58,10 @@ function Chatbot() {
       try {
         setIsLoading(true)
         const dataToSend = { 
-          'notepad': notepad,
           'message': currInput,
           'status': status,
         };
-        const response = await fetch('http://127.0.0.1:5001/api/chatbot', {
+        const response = await fetch('http://127.0.0.1:5001/api/demo', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -81,7 +79,6 @@ function Chatbot() {
 
         
         status = data.status
-        notepad = data.notepad
         setMessages(prevMessages => [...prevMessages, { text: data.message, sender: 'bot' }]);
       } catch (error) {
         setError(error)
