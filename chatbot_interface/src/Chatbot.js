@@ -26,7 +26,9 @@ function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  //const [status, setStatus] = useState("START");
+  
+  let status = null
+  let notepad = null
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -36,8 +38,14 @@ function Chatbot() {
     return input.trim() === ''
   }
 
+  const handleEnter = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   const handleSendMessage = () => {
-    console.log("teste1");
     if (messageEmpty()) return;
 
     setError(null)
@@ -50,10 +58,10 @@ function Chatbot() {
     const fetchBotResponse = async () => {
       try {
         setIsLoading(true)
-        console.log("test");
         const dataToSend = { 
+          'notepad': notepad,
           'message': currInput,
-          //'status': status
+          'status': status,
         };
         const response = await fetch('http://127.0.0.1:5001/api/chatbot', {
           method: 'POST',
@@ -72,7 +80,8 @@ function Chatbot() {
         const data = await response.json();
 
         
-        // setStatus(data.status)
+        status = data.status
+        notepad = data.notepad
         setMessages(prevMessages => [...prevMessages, { text: data.message, sender: 'bot' }]);
       } catch (error) {
         setError(error)
@@ -84,6 +93,8 @@ function Chatbot() {
     }
     fetchBotResponse();
   }
+
+  let buttonText = isLoading ? "Loading..." : "Send"
 
   return (
     <div className="chatbot">
@@ -111,17 +122,13 @@ function Chatbot() {
                 value={input}
                 onChange={handleInputChange}
                 placeholder="Type here..."
+                onKeyDown={handleEnter}
             />
-            {
-              isLoading ? (
-                <div>Loading...</div>
-              ) : (
-              <button 
-                className={`chatbot_submit`} 
-                onClick={handleSendMessage} 
-                disabled={messageEmpty()}
-              >Send</button>)
-            }
+            <button 
+              className={`chatbot_submit`} 
+              onClick={handleSendMessage} 
+              disabled={messageEmpty() || isLoading}
+            >{buttonText}</button>
         </div>
     </div>
   );

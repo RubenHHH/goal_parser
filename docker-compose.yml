@@ -3,6 +3,14 @@ version: "1"
 services:
   chatbot_interface:
     container_name: chatbot_interface
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '8'
+    #       memory: 64M
+    #     reservations:
+    #       cpus: '4'
+    #       memory: 32M
     build:
       context: ./chatbot_interface
       dockerfile: Dockerfile
@@ -11,6 +19,8 @@ services:
     env_file:
       - .env
     image: chatbot_interface:latest
+    volumes:
+      - ./chatbot_interface/src/Chatbot.js:/app/src/Chatbot.js:rw
     depends_on:
       - chatbot_api
     networks:
@@ -19,12 +29,23 @@ services:
 
   chatbot_api:
     container_name: chatbot_api
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '8'
+    #       memory: 128M
+    #     reservations:
+    #       cpus: '4'
+    #       memory: 64M
     build:
       context: ./chatbot_api
       dockerfile: Dockerfile
     ports:
       - ${CHATBOT_API_PORT}:5000
     image: chatbot_api:latest
+    volumes:
+      - ./chatbot_api/app.py:/app/app.py:rw
+      - ./chatbot_api/chatbot.py:/app/chatbot.py:rw
     networks:
       goal_parser_network:
         ipv4_address: ${CHATBOT_API_IP}

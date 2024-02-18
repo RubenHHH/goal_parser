@@ -2,15 +2,30 @@ import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from llama_cpp import Llama
-from chatbot import invokeChatbot
+from chatbot import invokeChatbot, askFunctionsCorrect, identifyFucntions
 
 # from chatbot import invoke_few_shot_template
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
+
+logging.basicConfig(level=logging.DEBUG,  # Adjust log level as needed
+                    format='%(asctime)s %(levelname)s: %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+
 LLAMA2_API_URL = "http://your-llama2-api-url.com/predict"
 
+
+def log(text: str):
+    app.logger.info(f"""
+
+    =============================================
+    {text}
+    =============================================
+
+    """)
 
 @app.route("/api/repeat", methods=["POST"])
 def get_response():
@@ -57,23 +72,37 @@ def predict():
     
 @app.route('/api/chatbot', methods=['POST'])
 def chatbot():
+    log("Entered chatbot API endpoint")
+
     data = request.json
 
+    log(str(data))
+
+    status = None
+    notepad = None
     message = data['message']
-    logging.info("testing message")
-    #status = data['status']
-    logging.info("testing status")
+
+    if data['status'] == None:
+        status = "START"
+    else:
+        status = data['status']
+
+    if data['notepad'] == None:
+        notepad = dict()
+    else:
+        notepad = data['notepad'].json
+
 
     try:
-        #status, 
-        output = invokeChatbot(message) #add status when needed 
+        notepad['user_requests'] = "- I want to go to an concert and I need to know if I there are any places left for me. Where do I leave my motocycle?\n"
+        output, status, notepad = identifyFucntions(message, status, notepad, log) #add status when needed 
         # print(str(output))
-        extracted_text = output["choices"][0]["text"]
+        log("5")
         return jsonify(
             {
-                #'status': status,
-                'message': str(extracted_text), #status + "  " + 
-
+                'status': status,
+                'notepad': notepad,
+                'message': output, #status + "  " + 
             }
         )
     except Exception as e:
