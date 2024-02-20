@@ -287,11 +287,11 @@ def identifyLogicalOperators(message: str, status: str, notepad: dict[str, str],
 
     output = getModelOutput(prompt, logger)
 
-    useGoals = extract_string_within_square_brackets(output)
+    userGoals = extract_string_within_square_brackets(output)
 
     status = 'STRUCTURE'
     
-    return (useGoals, status, notepad)
+    return (userGoals, status, notepad)
 
 
 
@@ -303,17 +303,3 @@ def extract_string_within_square_brackets(input_string: str):
         return None  # No square brackets found
     
     return input_string[start_index+2:end_index +1]
-
-
-
-# def lowest_positive_integer(numbers):
-#     min_positive = None
-    
-#     for num in numbers:
-#         if num > 0 and (min_positive is None or num < min_positive):
-#             min_positive = num
-    
-#     if min_positive is None:
-#         return -1
-    
-#     return min_positive

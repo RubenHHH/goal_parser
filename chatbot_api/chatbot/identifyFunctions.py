@@ -41,12 +41,13 @@ def identifyFunctions(message: str, status: str, notepad: dict[str, str], logger
     output = getModelOutput(prompt, logger)
 
     pattern = r'\[(.*?)\]'
-    functionsList = re.findall(pattern, output)[0]
-    # functionsList = extract_text_between_brackets(extracted_text)
+    functions = re.findall(pattern, output)
 
-    notepad['functions'] = functionsList
+    if len(functions) == 0:
+        notepad['functions'] += output
     
+    notepad['functions'] += functions[0]
     status = 'FUCNTIONS'
+    
 
     return (notepad['functions'], status, notepad)
-    # return askFunctionsCorrect(extracted_text, status, notepad, logger)

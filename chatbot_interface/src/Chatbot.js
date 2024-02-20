@@ -26,9 +26,8 @@ function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  
-  let status = null
-  let notepad = null
+  const [status, setStatus] = useState(null);
+  const [notepad, setNotepad] = useState(null);
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -80,8 +79,8 @@ function Chatbot() {
         const data = await response.json();
 
         
-        status = data.status
-        notepad = data.notepad
+        setStatus(data.status)
+        setNotepad(data.notepad)
         setMessages(prevMessages => [...prevMessages, { text: data.message, sender: 'bot' }]);
       } catch (error) {
         setError(error)

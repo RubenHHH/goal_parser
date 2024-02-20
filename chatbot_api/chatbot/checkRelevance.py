@@ -1,9 +1,8 @@
 from .util import construct_prompt, getModelOutput
 from .identifyFunctions import identifyFunctions
-from .routeBasedOnStatus import routeBasedOnStatus
 
 
-prefix_relevanceCheck= """
+prefix_relevanceCheckStart= """
     Given the user input, determine if the request aligns with one of the following specified intents:
 
     Intents:
@@ -20,8 +19,9 @@ prefix_relevanceCheck= """
     Output Guidelines:
     Your response must strictly be one of the following, based on the user's input. Do not include any additional explanations, greetings, or any text beyond what is specified here.
 
-    - If all parts of the user's request fall within the specified intents, respond with 'OK'.
-    - If any part of the request is outside the specified intents, respond with: "What can I help you with? Your request should be one or multiple intents falling under the four listed above."
+    - If the user's request fall within the specified intents, respond with 'YES'.
+    - If the requests are outside the specified intents, respond with: "What can I help you with? Your request should be one or multiple intents falling under the four listed above."
+    - Do NOT say something like 'Based on the user's input, my response would be:'
 
     Ensure that your output matches one of these two options, word for word.
 
@@ -33,25 +33,32 @@ prefix_relevanceCheck= """
     -> User: "Where is my sandwich?". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
     -> User: "I feel lonely". Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
     -> User: "Where is the concert happening tonight"?. Expected output: What can I help you with? Your request should be one or multiple intents falling under the four listed above.
-    -> User: "Will it be cold tonight?". Expected output: OK.
-    -> User: "Can I still buy places for tonight's play?". Expected output: OK.
-    -> User: "Are there any spots for my motorbike near the theatre?". Expected output: OK.
+    -> User: "Will it be cold tonight?". Expected output: YES.
+    -> User: "Can I still buy places for tonight's play?". Expected output: YES.
+    -> User: "Are there any spots for my motorbike near the theatre?". Expected output: YES.
 
+"""
+
+prefix_relevanceCheckConfirmation = """
+    If the message you will see under </SYS> indicates that I am happy and agree, respond with 'YES'
+
+    If the message you will see under </SYS> indicates that I am unhappy or disagree with something said to me, there are 2 options:
+    - If the message explains why I disagree or what I want to change about something said previously, respond with 'YES'
+    - If the message does NOT explain why I disagree or what I want to change about something said previously, respond with a reminder that I should explain why I disagree.
 """
 
 
 def checkRelevance(message: str, status: str, notepad: dict[str, str], logger):
     logger(f"checkRelevance with {(message, status, notepad)}")
 
-    prompt = construct_prompt(message, prefix_relevanceCheck)
-    output = getModelOutput(prompt)
+    prompt = ""
+    if status == 'START':
+        prompt = construct_prompt(message, prefix_relevanceCheckStart)
+    if status == "FUNCTIONS" or status == "STRUCTURE":
+        prompt = construct_prompt(message, prefix_relevanceCheckConfirmation)
+    
+    output = getModelOutput(prompt, logger)
 
     notepad['user_requests'] += "- " + message + "\n"
 
-    
-    if output.__contains__('OK'):
-        logger(f"OK: {(output, status, notepad)}")
-        return routeBasedOnStatus(output, status, notepad)
-
-    logger(f"Not OK: {(output, status, notepad)}")
     return (output, status, notepad)
